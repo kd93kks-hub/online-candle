@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شمعة بلهب متحرك</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Arial', sans-serif;
+            gap: 40px;
+            padding: 20px;
+        }
+
+        .container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        /* اللهب الرئيسي */
+        .flame {
+            position: absolute;
+            bottom: 80px;
+            width: 40px;
+            height: 80px;
+            background: linear-gradient(to top, #ff6b00 0%, #ff8c00 25%, #ffa500 50%, #ffcc00 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            filter: drop-shadow(0 0 15px rgba(255, 107, 0, 0.8));
+            animation: flameFlicker 0.6s ease-in-out infinite;
+            transform-origin: center bottom;
+            transition: all 0.3s ease;
+            opacity: 1;
+        }
+
+        /* اللهب الثانوي (الأحمر) */
+        .flame::before {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 60px;
+            background: linear-gradient(to top, #ff3300 0%, #ff6600 50%, transparent 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flameFlicker 0.5s ease-in-out infinite 0.1s;
+        }
+
+        /* اللهب الثالث (الأصفر الداخلي) */
+        .flame::after {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(to top, #ffff00 0%, #ffcc00 50%, transparent 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flameFlicker 0.4s ease-in-out infinite 0.2s;
+        }
+
+        /* حالة الشمعة المطفأة */
+        .flame.off {
+            opacity: 0;
+            animation: none;
+        }
+
+        .flame.off::before,
+        .flame.off::after {
+            animation: none;
+            opacity: 0;
+        }
+
+        /* الشمع */
+        .candle {
+            position: absolute;
+            bottom: 0;
+            width: 60px;
+            height: 80px;
+            background: linear-gradient(to right, #f5deb3 0%, #ffe4b5 50%, #f5deb3 100%);
+            border-radius: 0 0 10px 10px;
+            box-shadow: 
+                inset -2px 0 5px rgba(0, 0, 0, 0.2),
+                inset 2px 0 5px rgba(255, 255, 255, 0.3),
+                0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* الفتيل */
+        .wick {
+            position: absolute;
+            bottom: 78px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 15px;
+            background: #333;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .wick.off {
+            background: #666;
+        }
+
+        /* الضوء المنعكس على الشمع */
+        .candle::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 15px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+
+        /* الظل حول اللهب */
+        .glow {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255, 107, 0, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: glowFlicker 0.6s ease-in-out infinite;
+            transition: all 0.3s ease;
+            opacity: 1;
+        }
+
+        .glow.off {
+            opacity: 0;
+            animation: none;
+        }
+
+        /* تأثير الضوء على الأرضية */
+        .light-effect {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 100px;
+            background: radial-gradient(ellipse at center, rgba(255, 107, 0, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: lightFlicker 0.6s ease-in-out infinite;
+            transition: all 0.3s ease;
+            opacity: 1;
+        }
+
+        .light-effect.off {
+            opacity: 0;
+            animation: none;
+        }
+
+        /* الحركات والتأثيرات */
+        @keyframes flameFlicker {
+            0%, 100% {
+                transform: scaleY(1) scaleX(1);
+                opacity: 1;
+            }
+            25% {
+                transform: scaleY(1.05) scaleX(0.95);
+                opacity: 0.95;
+            }
+            50% {
+                transform: scaleY(0.98) scaleX(1.02);
+                opacity: 1;
+            }
+            75% {
+                transform: scaleY(1.02) scaleX(0.98);
+                opacity: 0.97;
+            }
+        }
+
+        @keyframes glowFlicker {
+            0%, 100% {
+                opacity: 0.3;
+                filter: blur(15px);
+            }
+            50% {
+                opacity: 0.5;
+                filter: blur(20px);
+            }
+        }
+
+        @keyframes lightFlicker {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 0.35;
+            }
+        }
+
+        /* نص توضيحي */
+        .title {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* منطقة التحكم */
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 600px;
+        }
+
+        /* الأزرار */
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* زر التشغيل والإطفاء */
+        #toggleBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-width: 150px;
+        }
+
+        #toggleBtn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        /* أزرار الألوان */
+        .color-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-btn::before {
+            content: '✓';
+            position: absolute;
+            font-size: 24px;
+            color: white;
+            display: none;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .color-btn.active::before {
+            display: flex;
+        }
+
+        /* ألوان مختلفة للأزرار */
+        .color-orange {
+            background: linear-gradient(135deg, #ff6b00 0%, #ffa500 100%);
+        }
+
+        .color-red {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+        }
+
+        .color-blue {
+            background: linear-gradient(135deg, #0066ff 0%, #0044cc 100%);
+        }
+
+        .color-green {
+            background: linear-gradient(135deg, #00cc00 0%, #009900 100%);
+        }
+
+        .color-purple {
+            background: linear-gradient(135deg, #cc00ff 0%, #9900cc 100%);
+        }
+
+        .color-pink {
+            background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+        }
+
+        /* تسميات الألوان */
+        .color-label {
+            color: #fff;
+            font-size: 12px;
+            margin-top: 5px;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* مجموعة الألوان */
+        .color-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .colors-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* حالة الشمعة */
+        .status {
+            color: #fff;
+            font-size: 14px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">🕯️ شمعة بلهب متحرك</div>
+        <div class="glow"></div>
+        <div class="light-effect"></div>
+        <div class="flame"></div>
+        <div class="wick"></div>
+        <div class="candle"></div>
+    </div>
+
+    <div class="controls">
+        <div style="width: 100%; text-align: center;">
+            <button id="toggleBtn">إشعال الشمعة 🔥</button>
+        </div>
+        
+        <div style="width: 100%;">
+            <div style="color: #fff; text-align: center; margin-bottom: 10px; font-weight: bold;">اختر لون اللهب:</div>
+            <div class="colors-container">
+                <div class="color-group">
+                    <button class="color-btn color-orange active" data-color="orange"></button>
+                    <div class="color-label">برتقالي</div>
+                </div>
+                <div class="color-group">
+                    <button class="color-btn color-red" data-color="red"></button>
+                    <div class="color-label">أحمر</div>
+                </div>
+                <div class="color-group">
+                    <button class="color-btn color-blue" data-color="blue"></button>
+                    <div class="color-label">أزرق</div>
+                </div>
+                <div class="color-group">
+                    <button class="color-btn color-green" data-color="green"></button>
+                    <div class="color-label">أخضر</div>
+                </div>
+                <div class="color-group">
+                    <button class="color-btn color-purple" data-color="purple"></button>
+                    <div class="color-label">بنفسجي</div>
+                </div>
+                <div class="color-group">
+                    <button class="color-btn color-pink" data-color="pink"></button>
+                    <div class="color-label">وردي</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="width: 100%; text-align: center;">
+            <div class="status" id="status">الشمعة مشتعلة ✓</div>
+        </div>
+    </div>
+
+    <script>
+        // متغيرات الحالة
+        let isLit = true;
+        let currentColor = 'orange';
+
+        // العناصر
+        const flame = document.querySelector('.flame');
+        const glow = document.querySelector('.glow');
+        const lightEffect = document.querySelector('.light-effect');
+        const wick = document.querySelector('.wick');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const colorBtns = document.querySelectorAll('.color-btn');
+        const statusDiv = document.getElementById('status');
+
+        // ألوان اللهب المختلفة
+        const flameColors = {
+            orange: {
+                main: 'linear-gradient(to top, #ff6b00 0%, #ff8c00 25%, #ffa500 50%, #ffcc00 100%)',
+                secondary: 'linear-gradient(to top, #ff3300 0%, #ff6600 50%, transparent 100%)',
+                tertiary: 'linear-gradient(to top, #ffff00 0%, #ffcc00 50%, transparent 100%)',
+                glow: 'rgba(255, 107, 0, 0.3)',
+                light: 'rgba(255, 107, 0, 0.2)',
+                shadow: 'rgba(255, 107, 0, 0.8)'
+            },
+            red: {
+                main: 'linear-gradient(to top, #cc0000 0%, #ff0000 25%, #ff3333 50%, #ff6666 100%)',
+                secondary: 'linear-gradient(to top, #990000 0%, #cc0000 50%, transparent 100%)',
+                tertiary: 'linear-gradient(to top, #ff3333 0%, #ff0000 50%, transparent 100%)',
+                glow: 'rgba(255, 0, 0, 0.3)',
+                light: 'rgba(255, 0, 0, 0.2)',
+                shadow: 'rgba(255, 0, 0, 0.8)'
+            },
+            blue: {
+                main: 'linear-gradient(to top, #0044cc 0%, #0066ff 25%, #3366ff 50%, #6699ff 100%)',
+                secondary: 'linear-gradient(to top, #0022aa 0%, #0044cc 50%, transparent 100%)',
+                tertiary: 'linear-gradient(to top, #3366ff 0%, #0066ff 50%, transparent 100%)',
+                glow: 'rgba(0, 102, 255, 0.3)',
+                light: 'rgba(0, 102, 255, 0.2)',
+                shadow: 'rgba(0, 102, 255, 0.8)'
+            },
+            green: {
+                main: 'linear-gradient(to top, #009900 0%, #00cc00 25%, #33ff33 50%, #66ff66 100%)',
+                secondary: 'linear-gradient(to top, #006600 0%, #009900 50%, transparent 100%)',
+                tertiary: 'linear-gradient(to top, #33ff33 0%, #00cc00 50%, transparent 100%)',
+                glow: 'rgba(0, 204, 0, 0.3)',
+                light: 'rgba(0, 204, 0, 0.2)',
+                shadow: 'rgba(0, 204, 0, 0.8)'
+            },
+            purple: {
+                main: 'linear-gradient(to top, #9900cc 0%, #cc00ff 25%, #dd33ff 50%, #ee66ff 100%)',
+                secondary: 'linear-gradient(to top, #660099 0%, #9900cc 50%, transparent 100%)',
+                tertiary: 'linear-gradient(to top, #dd33ff 0%, #cc00ff 50%, transparent 100%)',
+                glow: 'rgba(204, 0, 255, 0.3)',
+                light: 'rgba(204, 0, 255, 0.2)',
+                shadow: 'rgba(204, 0, 255, 0.8)'
+            },
+            pink: {
+                main: 'linear-gradient(to top, #cc0066 0%, #ff1493 25%, #ff69b4 50%, #ffb6d9 100%)',
+                secondary: 'linear-gradient(to top, #990055 0%, #cc0066 50%, transparent 100%)',
+                tertiary: 'linear-gradient(to top, #ff69b4 0%, #ff1493 50%, transparent 100%)',
+                glow: 'rgba(255, 20, 147, 0.3)',
+                light: 'rgba(255, 20, 147, 0.2)',
+                shadow: 'rgba(255, 20, 147, 0.8)'
+            }
+        };
+
+        // دالة تغيير لون اللهب
+        function changeFlameColor(color) {
+            currentColor = color;
+            const colors = flameColors[color];
+
+            flame.style.background = colors.main;
+            flame.style.filter = `drop-shadow(0 0 15px ${colors.shadow})`;
+            
+            // تحديث اللهب الثانوي
+            const flameBeforeStyle = document.createElement('style');
+            flameBeforeStyle.textContent = `.flame::before { background: ${colors.secondary} !important; }`;
+            document.head.appendChild(flameBeforeStyle);
+
+            // تحديث اللهب الثالث
+            const flameAfterStyle = document.createElement('style');
+            flameAfterStyle.textContent = `.flame::after { background: ${colors.tertiary} !important; }`;
+            document.head.appendChild(flameAfterStyle);
+
+            // تحديث التوهج
+            glow.style.background = `radial-gradient(circle, ${colors.glow} 0%, transparent 70%)`;
+
+            // تحديث تأثير الضوء
+            lightEffect.style.background = `radial-gradient(ellipse at center, ${colors.light} 0%, transparent 70%)`;
+
+            // تحديث الزر النشط
+            colorBtns.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-color="${color}"]`).classList.add('active');
+        }
+
+        // دالة تشغيل وإطفاء الشمعة
+        function toggleCandle() {
+            isLit = !isLit;
+
+            if (isLit) {
+                flame.classList.remove('off');
+                glow.classList.remove('off');
+                lightEffect.classList.remove('off');
+                wick.classList.remove('off');
+                toggleBtn.textContent = 'إطفاء الشمعة 💨';
+                statusDiv.textContent = 'الشمعة مشتعلة ✓';
+                changeFlameColor(currentColor);
+            } else {
+                flame.classList.add('off');
+                glow.classList.add('off');
+                lightEffect.classList.add('off');
+                wick.classList.add('off');
+                toggleBtn.textContent = 'إشعال الشمعة 🔥';
+                statusDiv.textContent = 'الشمعة مطفأة ✗';
+            }
+        }
+
+        // إضافة مستمعي الأحداث
+        toggleBtn.addEventListener('click', toggleCandle);
+
+        colorBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const color = e.currentTarget.getAttribute('data-color');
+                if (isLit) {
+                    changeFlameColor(color);
+                }
+            });
+        });
+
+        // تهيئة اللون الأولي
+        changeFlameColor('orange');
+    </script>
+</body>
+</html>
