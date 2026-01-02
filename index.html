@@ -17,8 +17,42 @@
 body{
     margin:0;
     font-family:Arial;
-    background:radial-gradient(circle at top, #0f766e, #020617 70%);
+    background:radial-gradient(circle at top,#0f766e,#020617 70%);
     color:var(--text);
+}
+
+/* عام */
+.hidden{display:none;}
+button{
+    background:linear-gradient(135deg,var(--sky),var(--turq));
+    border:none;
+    padding:10px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* تسجيل الدخول */
+.login{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.login-box{
+    background:var(--card);
+    padding:30px;
+    border-radius:15px;
+    width:300px;
+    text-align:center;
+}
+.login-box h2{color:var(--turq);}
+.login-box input{
+    width:100%;
+    margin:10px 0;
+    padding:10px;
+    border-radius:8px;
+    border:none;
 }
 
 /* زر القائمة */
@@ -26,40 +60,35 @@ body{
     position:fixed;
     top:20px;
     right:20px;
-    font-size:30px;
+    font-size:28px;
     cursor:pointer;
     color:var(--sky);
     z-index:1001;
 }
 
-/* القائمة الجانبية */
+/* القائمة */
 .sidebar{
     position:fixed;
     top:0;
-    right:-270px;
-    width:270px;
+    right:-260px;
+    width:260px;
     height:100%;
-    background:linear-gradient(180deg,#020617,#0f172a);
-    padding:30px 20px;
+    background:#020617;
+    padding:25px;
     transition:.4s;
     z-index:1000;
 }
 .sidebar.active{right:0;}
-.sidebar h2{
-    color:var(--turq);
-    margin-bottom:30px;
-}
+.sidebar h2{color:var(--turq);}
 .sidebar a{
     display:block;
-    padding:12px 15px;
-    margin-bottom:10px;
+    margin:12px 0;
+    padding:10px;
     border-radius:10px;
-    color:var(--text);
-    text-decoration:none;
-    transition:.3s;
+    cursor:pointer;
 }
-.sidebar a.active,
-.sidebar a:hover{
+.sidebar a:hover,
+.sidebar a.active{
     background:linear-gradient(135deg,var(--sky),var(--turq));
     color:#020617;
     font-weight:bold;
@@ -68,142 +97,131 @@ body{
 /* المحتوى */
 .main{
     padding:90px 20px;
-    max-width:1200px;
+    max-width:1100px;
     margin:auto;
 }
-.main h1{
-    color:var(--turq);
-    font-size:38px;
-    margin-bottom:5px;
-}
-.main p{opacity:.85}
+.section{display:none;}
+.section.active{display:block;}
 
-/* الأقسام */
-.section{
-    margin-top:60px;
-}
-.section h2{
-    color:var(--sky);
-    margin-bottom:20px;
-    border-right:4px solid var(--turq);
-    padding-right:10px;
-}
-
-/* الكروت */
 .cards{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:20px;
 }
 .card{
-    background:linear-gradient(180deg,#0f172a,#020617);
-    border-radius:18px;
-    padding:25px;
-    box-shadow:0 0 25px rgba(0,0,0,.6);
-    transition:.4s;
+    background:var(--card);
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 0 20px rgba(0,0,0,.6);
 }
-.card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 0 30px rgba(34,211,238,.6);
-}
-.card h3{
-    color:var(--turq);
-    margin-bottom:10px;
-}
-.card span{
-    display:inline-block;
-    margin-top:10px;
-    color:var(--sky);
-    font-weight:bold;
-}
+.card h3{color:var(--turq);}
+.card span{color:var(--sky);}
 </style>
 </head>
 
 <body>
 
+<!-- تسجيل الدخول -->
+<div class="login" id="login">
+    <div class="login-box">
+        <h2>تسجيل الدخول</h2>
+        <input id="user" placeholder="اسم المستخدم">
+        <input id="pass" type="password" placeholder="كلمة السر">
+        <button onclick="login()">دخول</button>
+    </div>
+</div>
+
+<!-- الموقع -->
+<div id="site" class="hidden">
+
 <div class="menu-btn" onclick="toggleMenu()">☰</div>
 
 <div class="sidebar" id="sidebar">
     <h2>الصخورري</h2>
-    <a href="#home" class="active">🏠 الرئيسية</a>
-    <a href="#games">🎮 الألعاب</a>
-    <a href="#charge">💳 الشحن</a>
-    <a href="#contact">💬 تواصل</a>
+    <a onclick="show('games')" class="active">🎮 الألعاب</a>
+    <a onclick="show('numbers')">📱 الأرقام</a>
+    <a onclick="show('charge')">💳 الشحن</a>
+    <a onclick="show('contact')">💬 تواصل</a>
 </div>
 
-<div class="main" id="home">
-    <h1>الصخورري</h1>
-    <p>منصة فاخرة للألعاب والخدمات الرقمية</p>
+<div class="main">
 
-    <!-- الألعاب -->
-    <div class="section" id="games">
-        <h2>🎮 الألعاب</h2>
-        <div class="cards">
-            <div class="card">
-                <h3>Game Pass</h3>
-                <p>اشتراك شهري للألعاب</p>
-                <span>وهمي – 10$</span>
-            </div>
-            <div class="card">
-                <h3>Steam Wallet</h3>
-                <p>بطاقات ستيم</p>
-                <span>وهمي – 20$</span>
-            </div>
-            <div class="card">
-                <h3>PUBG UC</h3>
-                <p>شحن شدات</p>
-                <span>وهمي – 15$</span>
-            </div>
-        </div>
+<!-- الألعاب -->
+<div id="games" class="section active">
+<h2>🎮 الألعاب</h2>
+<div class="cards">
+    <div class="card"><h3>PUBG</h3><span>شحن UC</span></div>
+    <div class="card"><h3>Steam</h3><span>بطاقات</span></div>
+</div>
+</div>
+
+<!-- الأرقام -->
+<div id="numbers" class="section">
+<h2>📱 الأرقام</h2>
+<div class="cards">
+    <div class="card">
+        <h3>رقم واتساب</h3>
+        <p>تفعيل حساب</p>
+        <button onclick="buy()">شراء</button>
     </div>
-
-    <!-- الشحن -->
-    <div class="section" id="charge">
-        <h2>💳 الشحن</h2>
-        <div class="cards">
-            <div class="card">
-                <h3>رصيد تركي</h3>
-                <p>شحن أرقام تركية</p>
-                <span>وهمي</span>
-            </div>
-            <div class="card">
-                <h3>USDT</h3>
-                <p>شحن محافظ رقمية</p>
-                <span>وهمي</span>
-            </div>
-        </div>
+    <div class="card">
+        <h3>رقم تيليغرام</h3>
+        <p>تفعيل حساب</p>
+        <button onclick="buy()">شراء</button>
     </div>
+</div>
+</div>
 
-    <!-- تواصل -->
-    <div class="section" id="contact">
-        <h2>💬 تواصل معنا</h2>
-        <div class="cards">
-            <div class="card">
-                <h3>واتساب</h3>
-                <p>دعم مباشر</p>
-            </div>
-            <div class="card">
-                <h3>تيليغرام</h3>
-                <p>قناة العروض</p>
-            </div>
-        </div>
-    </div>
+<!-- الشحن -->
+<div id="charge" class="section">
+<h2>💳 الشحن</h2>
+<div class="cards">
+    <div class="card"><h3>USDT</h3></div>
+    <div class="card"><h3>رصيد</h3></div>
+</div>
+</div>
 
+<!-- تواصل -->
+<div id="contact" class="section">
+<h2>💬 تواصل معنا</h2>
+<div class="cards">
+    <div class="card">واتساب: +963984310352</div>
+    <div class="card">تيليغرام</div>
+</div>
+</div>
+
+</div>
 </div>
 
 <script>
 function toggleMenu(){
-    document.getElementById("sidebar").classList.toggle("active");
+    sidebar.classList.toggle("active");
 }
 
-/* تفعيل الرابط */
-document.querySelectorAll(".sidebar a").forEach(link=>{
-    link.addEventListener("click",()=>{
-        document.querySelectorAll(".sidebar a").forEach(a=>a.classList.remove("active"));
-        link.classList.add("active");
-        document.getElementById("sidebar").classList.remove("active");
-    });
-});
+function show(id){
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.querySelectorAll(".sidebar a").forEach(a=>a.classList.remove("active"));
+    event.target.classList.add("active");
+    sidebar.classList.remove("active");
+}
+
+function buy(){
+    window.open("https://wa.me/963984310352","_blank");
+}
+
+/* تسجيل الدخول */
+function login(){
+    if(user.value==="admin" && pass.value==="12345"){
+        loginDiv.style.display="none";
+        site.classList.remove("hidden");
+    }else{
+        alert("بيانات الدخول غير صحيحة");
+    }
+}
+
+const loginDiv=document.getElementById("login");
+const site=document.getElementById("site");
 </script>
 
 </body>
